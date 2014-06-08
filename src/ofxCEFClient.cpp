@@ -44,8 +44,10 @@ void ofxCEFClient::init(std::string startupResource) {
 
 	ofLogNotice() << "Using UI HTML Document: \n " << startResource << std::endl; 
 
-	ClientAppInit(this, startResource); 
-
+    #if defined(OS_MACOSX)
+    #else
+	ClientAppInit(this, startResource);
+    #endif
 }
 
 void ofxCEFClient::loop() {
@@ -53,7 +55,9 @@ void ofxCEFClient::loop() {
 	// This doesn't work quite right. The idea was to set buffer, width, and height but they return junk values
 	// so the ->doneLoading flag needs to work better.
 
-	if (myClientHandler.get()->hasBrowser() == true && _initialized == false) {
+    
+    
+	if (myClientHandler->GetBrowser() && _initialized == false) {
 
 		_initialized = true; 
 		_browserHost = myClientHandler.get()->GetBrowser()->GetHost();
@@ -69,11 +73,17 @@ void ofxCEFClient::loop() {
 	//  TOFIX: It's really not ideal to set these pointers constantly... 
 	if (loadingTex) {
 
-		loadingTex = false; 
+		loadingTex = false;
+        CefRect windowRect;
+        myClientHandler->GetViewRect(myClientHandler->GetBrowser(), windowRect);
 		
-		buffer = (unsigned char *) myClientHandler.get()->buffer; 
-		width = myClientHandler.get()->width; 
-		height = myClientHandler.get()->height; 
+		//buffer = (unsigned char *) myClientHandler.get()->buffer;
+        
+     
+        
+        
+		width = windowRect.width;
+		height =  windowRect.height;
 
 		_cef_buffer.loadData(buffer, width, height, GL_BGRA);
 

@@ -3,27 +3,35 @@
 #pragma once
 
 #include "ofMain.h"
-#include "client.h"
-#include <thread>
-#include <mutex>
+#include "cefclient.h"
 
+/*
+#ifdef TARGET_WIN32
+    #include <thread>
+    #include <mutex>
+#else
+    #include "thread.h"
+    #include "mutex.h"
+#endif
+*/
+ 
 class message_queue {
 
 	public: 
 
 	std::deque < CefRefPtr<CefProcessMessage> > fifo;
-	std::mutex guard;            
+	//std::mutex guard;
 
 	void post (const CefRefPtr<CefProcessMessage> &msg) {
-		std::lock_guard<std::mutex> lock(guard);
-		fifo.push_back(msg->Copy());
+		//std::lock_guard<std::mutex> lock(guard);
+        fifo.push_back(msg->Copy());
 	}
 
 	bool fetch (CefRefPtr<CefProcessMessage> &message) {
 
 		bool hasMessage = false; 
 
-		std::lock_guard<std::mutex> lock(guard);
+		//std::lock_guard<std::mutex> lock(guard);
 
 		if (fifo.size()) {
 			message = fifo.front();
